@@ -42,28 +42,26 @@ def generate_machine_code(hardware_info):
     machine_code = hashlib.sha256(hardware_info.encode()).hexdigest()
     return machine_code
 
-def fetch_machine_codes_from_url(url):
-    """从指定 URL 下载并解析机器码列表"""
-    try:
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            # 解析 JSON 数据为列表
-            try:
-                machine_codes = json.loads(response.text)
-                if isinstance(machine_codes, list):
-                    return [code.strip() for code in machine_codes if isinstance(code, str) and code.strip()]
-                else:
-                    print("JSON 数据格式错误，不是数组类型。")
-                    return []
-            except json.JSONDecodeError as e:
-                print(f"解析 JSON 数据失败: {e}")
-                return []
-        else:
-            print(f"无法下载 JSON 数据，状态码: {response.status_code}")
-            return []
-    except Exception as e:
-        print(f"下载 JSON 数据失败: {e}")
-        return []
+def fetch_machine_codes_from_url(urls):
+    """从指定 URL 列表中依次下载并解析机器码列表"""
+    for url in urls:
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                # 解析 JSON 数据为列表
+                try:
+                    machine_codes = json.loads(response.text)
+                    if isinstance(machine_codes, list):
+                        return [code.strip() for code in machine_codes if isinstance(code, str) and code.strip()]
+                    else:
+                        print(f"JSON 数据格式错误，不是数组类型（URL: {url}）。")
+                except json.JSONDecodeError as e:
+                    print(f"解析 JSON 数据失败: {e} (URL: {url})")
+            else:
+                print(f"无法下载 JSON 数据，状态码: {response.status_code} (URL: {url})")
+        except Exception as e:
+            print(f"下载 JSON 数据失败: {e} (URL: {url})")
+    return []
 
 def compare_machine_code(machine_code, machine_codes):
     """对比生成的机器码是否存在于列表中"""
@@ -105,9 +103,17 @@ if __name__ == "__main__":
         show_result_message_box("错误", "无法生成机器码，请检查硬件信息。")
         exit()
 
+    # 定义多个 JSON 文件链接
+    json_urls = [
+        "https://github.com/IAMJOYBO/machine_code/raw/refs/heads/main/machine_code.json",
+        "https://github.3x25.com/https://raw.githubusercontent.com/IAMJOYBO/machine_code/main/machine_code.json",
+        "https://ghfast.top/https://raw.githubusercontent.com/IAMJOYBO/machine_code/main/machine_code.json",
+        "https://ghproxy.net/https://raw.githubusercontent.com/IAMJOYBO/machine_code/main/machine_code.json",
+        "https://raw.gitcode.com/xiaobeing/machine_code/raw/main/machine_code.json"
+    ]
+
     # 下载并解析 JSON 数据
-    json_url = "https://gitcode.com/xiaobeing/machine_code/blob/main/machine_code.json"
-    machine_codes = fetch_machine_codes_from_url(json_url)
+    machine_codes = fetch_machine_codes_from_url(json_urls)
     if not machine_codes:
         show_result_message_box("错误", "无法下载或解析 JSON 数据，请检查网络连接或文件格式。")
         exit()
