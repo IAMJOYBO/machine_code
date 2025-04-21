@@ -106,7 +106,7 @@ if __name__ == "__main__":
         exit()
 
     # 下载并解析 JSON 数据
-    json_url = "https://github.3x25.com/https://raw.githubusercontent.com/IAMJOYBO/machine_code/main/machine_code.json"
+    json_url = "https://gitcode.com/xiaobeing/machine_code/blob/main/machine_code.json"
     machine_codes = fetch_machine_codes_from_url(json_url)
     if not machine_codes:
         show_result_message_box("错误", "无法下载或解析 JSON 数据，请检查网络连接或文件格式。")
